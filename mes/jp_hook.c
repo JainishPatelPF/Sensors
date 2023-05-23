@@ -6,7 +6,12 @@
 #include <stdint.h>
 #include <ctype.h>
 #include "common.h"
+
 int add_test(int x, int y, int del);
+
+int jp_led_demo_a2(int count, int delay);
+
+
 void AddTest(int action)
 {
 if(action==CMD_SHORT_HELP) return;
@@ -24,5 +29,33 @@ delay = 0xFFFFFF;
 // When we call our function, pass the delay value.
 // printf(“<<< here is where we call add_test – can you add a third parameter? >>>”);
 printf("add_test returned: %d\n", add_test(99, 87, delay));
+}
+ADD_CMD("add", AddTest,"Test the new add function")
+
+void _jp_A2(int action)
+{
+if(action==CMD_SHORT_HELP) return;
+if(action==CMD_LONG_HELP) {
+printf("Addition Test\n\n" "This command tests new addition function\n");
+return;
+}
+uint32_t delay;
+int fetch_status;
+fetch_status = fetch_uint32_arg(&delay);
+if(fetch_status) {
+// Use a default delay value
+delay = 1000;
+
+
+ uint32_t user_input;
+ int fetch_status;
+ fetch_status = fetch_uint32_arg(&user_input);
+ if(fetch_status) {
+ // Use a default value
+ user_input = 2;
+ }
+ 
+}
+printf("A2 Returned: %d\n", jp_led_demo_a2(delay, 99));
 }
 ADD_CMD("add", AddTest,"Test the new add function")

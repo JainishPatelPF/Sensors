@@ -4,7 +4,62 @@
 .code 16 @ This directive selects the instruction set being generated.
 @ The value 16 selects Thumb, with the value 32 selecting ARM.
 .text @ Tell the assembler that the upcoming section is to be considered
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                    @DATA SECTION@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Data section - initialized values
+.data
+.align 3 @ This alignment is critical - to access our "huge" value, it must
+@ be 64 bit aligned
+
+huge: .octa 0xAABBCCDDDDCCBBAA
+big: .word 0xAAAABBBB
+num: .byte 0xAB
+str2: .asciz "Hallo Welt!"
+count: .word 12345 @ This is an initialized 32 bit value
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+.text
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Assignments & Labs From Here @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
 @ assembly language instructions - Code section (text -> ROM)
+
+@@ Function Header Block
+.align 2 @ Code alignment - 2^n alignment (n=2)
+@ This causes the assembler to use 4 byte alignment
+.syntax unified @ Sets the instruction set to the new unified ARM + THUMB
+@ instructions. The default is divided (separate instruction sets)
+.global add_test @ Make the symbol name for the function visible to the linker
+.code 16 @ 16bit THUMB code (BOTH .code and .thumb_func are required)
+.thumb_func @ Specifies that the following symbol is the name of a THUMB
+
+@ encoded function. Necessary for interlinking between ARM and THUMB code.
+.type add_test, %function @ Declares that the symbol is a function (not strictly required)
+@ Function Declaration : int add_test(int x, int y)
+@
+@ Input: r0, r1 (i.e. r0 holds x, r1 holds y)
+@ Returns: r0
+@
+@ Here is the actual add_test function
+add_test:
+push {lr}
+add r0, r0, r1
+mov r0, #3
+bl BSP_LED_Toggle
+mov r0, r2
+bl busy_delay
+pop {lr}
+bx lr @ Return (Branch eXchange) to the address in the link register (lr)
+.size add_test, .-add_test @@ - symbol size (not strictly required, but makes the debugger happy)
+
+
+
+
+
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Past Assignments & Labs @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
 @@ Function Header Block
 .align 2 @ Code alignment - 2^n alignment (n=2)
 @ This causes the assembler to use 4 byte alignment

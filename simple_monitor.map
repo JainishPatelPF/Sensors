@@ -167,7 +167,7 @@ Discarded input sections
  .text          0x0000000000000000        0x0 build/mes/jp_hook.o
  .data          0x0000000000000000        0x0 build/mes/jp_hook.o
  .bss           0x0000000000000000        0x0 build/mes/jp_hook.o
- .data          0x0000000000000000        0x0 build/mes/jp_asm.o
+ .data          0x0000000000000000       0x25 build/mes/jp_asm.o
  .bss           0x0000000000000000        0x0 build/mes/jp_asm.o
  .bss           0x0000000000000000        0x0 build/mycode.o
  .text          0x0000000000000000        0x0 build/mytest.o
