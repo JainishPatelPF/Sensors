@@ -50,7 +50,7 @@ delay = 1000;
  uint32_t user_input;
  int fetch_status;
  fetch_status = fetch_uint32_arg(&user_input);
- if(fetch_status) {
+ if(fetch_status) { 
  // Use a default value
  user_input = 2;
  }

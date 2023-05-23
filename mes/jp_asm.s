@@ -32,7 +32,7 @@ count: .word 12345 @ This is an initialized 32 bit value
 @ instructions. The default is divided (separate instruction sets)
 .global add_test @ Make the symbol name for the function visible to the linker
 .code 16 @ 16bit THUMB code (BOTH .code and .thumb_func are required)
-.thumb_func @ Specifies that the following symbol is the name of a THUMB
+.thumb_func @ Specifies that the following symbol is the name of a THUMB 
 
 @ encoded function. Necessary for interlinking between ARM and THUMB code.
 .type add_test, %function @ Declares that the symbol is a function (not strictly required)
