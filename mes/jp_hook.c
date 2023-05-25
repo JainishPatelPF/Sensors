@@ -9,7 +9,7 @@
 
 int add_test(int x, int y, int del);
 
-int jp_led_demo_a2(int count, int delay);
+int jp_led_demo_a2(int count, int delay);       //function declaration for assignment 2 defined in asm file.
 
 
 void AddTest(int action)
@@ -32,6 +32,13 @@ printf("add_test returned: %d\n", add_test(99, 87, delay));
 }
 ADD_CMD("add", AddTest,"Test the new add function")
 
+
+// Funtion Name: _jp_A2(int)
+// Function Parameters: action
+// Function Description: This is the function used for Assignment 2 and This function gets two parameters from UI and sends it to the asm file.
+ // Fetch_uint32_arg gets two parameters : count and delay
+
+
 void _jp_A2(int action)
 {
 if(action==CMD_SHORT_HELP) return;
@@ -39,7 +46,7 @@ if(action==CMD_LONG_HELP) {
 printf("Addition Test\n\n" "This command tests new addition function\n");
 return;
 }
-uint32_t user_input1;
+uint32_t user_input1;                                                   //User Input block 1 for Count
  int fetch_status1;
  fetch_status1 = fetch_uint32_arg(&user_input1);
  if(fetch_status1) {
@@ -47,7 +54,7 @@ uint32_t user_input1;
  user_input1 = 2;
  } 
 
- uint32_t user_input2;
+ uint32_t user_input2;                                                  //User Input block 1 for Delay
  int fetch_status2;
  fetch_status2 = fetch_uint32_arg(&user_input2);
  if(fetch_status2) {
@@ -56,6 +63,6 @@ uint32_t user_input1;
  } 
  
 
-printf("A2 Returned: %d\n", jp_led_demo_a2(user_input1, user_input2));
+printf("A2 Returned: %d\n", jp_led_demo_a2(user_input1, user_input2));  //Prints return value from this function defined in asm file.
 }
-ADD_CMD("A2", _jp_A2, "\tA02 - Calling Functions")
+ADD_CMD("A2", _jp_A2, "\tA02 - Calling Functions") //macro command for Assignment 2. Called by : "A2 parameter1 parameter2"

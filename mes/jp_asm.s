@@ -36,68 +36,49 @@ count: .word 12345 @ This is an initialized 32 bit value
 
 @ encoded function. Necessary for interlinking between ARM and THUMB code.
 .type jp_led_demo_a2, %function @ Declares that the symbol is a function (not strictly required)
-@ Function Declaration : int jp_led_demo_a2(int x, int y)
+
+@ Function Declaration : int jp_led_demo_a2(int count, int delay)
 @
-@ Input: r0, r1 (i.e. r0 holds x, r1 holds y)
+@ Input: r0, r1
 @ Returns: r0
 @
 @ Here is the actual jp_led_demo_a2 function
+
 jp_led_demo_a2:
+push {r5, r6, r7, lr}
+mov r5, r0       @saves count in register r5
+mov r6, r1       @saves delay in register r6
 
-push {r0, r1, r5, r6, lr}
-mov r5, r0       @count
-mov r6, r1       @delay
+toggle_loop:   
 
-toggle_loop:    
-    mov r0, #0
-    bl BSP_LED_Toggle
-    mov r0, #1
-    bl BSP_LED_Toggle
-    mov r0, #2
-    bl BSP_LED_Toggle
-    mov r0, #3
-    bl BSP_LED_Toggle
-    mov r0, #4
-    bl BSP_LED_Toggle
-    mov r0, #5
-    bl BSP_LED_Toggle
-    mov r0, #6
-    bl BSP_LED_Toggle
-    mov r0, #7
-    bl BSP_LED_Toggle
+    mov r7, #7                              @setting r7 to 7 to decrement count for led.
+    led_on_toggle_loop:                     @this loop toggles led on until all led's are on
+		mov r0, r7
+		bl BSP_LED_Toggle                   @toggles selected led
+		subs r7, r7, #1                     @decrements the counter
+		bge led_on_toggle_loop              @checks if it greater than equal to zero
 
-    mov r0, r6
-    bl busy_delay
+    mov r0, r6                              @add delay to register 0 from r6
+    bl busy_delay                           @calls busy_delay for delay
     
-    mov r0, #0
-    bl BSP_LED_Toggle
-    mov r0, #1
-    bl BSP_LED_Toggle
-    mov r0, #2
-    bl BSP_LED_Toggle
-    mov r0, #3
-    bl BSP_LED_Toggle
-    mov r0, #4
-    bl BSP_LED_Toggle
-    mov r0, #5
-    bl BSP_LED_Toggle
-    mov r0, #6
-    bl BSP_LED_Toggle
-    mov r0, #7
-    bl BSP_LED_Toggle
+    mov r7, #7                              @sets r7 with 7 to decrement count for led
+    led_off_toggle_loop:                    @turns all leds off
+		mov r0, r7                      
+		bl BSP_LED_Toggle                   @toggles selected led from r0
+		subs r7, r7, #1                     @decrements the counter
+		bge led_off_toggle_loop             @loops until r7 = -1
 
-    mov r0, r6
-    bl busy_delay
+    mov r0, r6                              @adds delay to register 0 from r6
+    bl busy_delay                           @calls busy_delay
 
-subs r5, r5, #1
-bgt toggle_loop
+subs r5, r5, #1                             @decrements the count entered by user or default - 2.
+bgt toggle_loop                             @it loops until r5 is greater than 0
 
-pop {r0, r1, r5, r6, lr}
+mov  r0, #0                                 @returns 0 if success
+
+pop {r5, r6, r7, lr}
 bx lr
 .size jp_led_demo_a2, .-jp_led_demo_a2 @@ - symbol size (not strictly required, but makes the debugger happy)
-
-
-
 
 
 
