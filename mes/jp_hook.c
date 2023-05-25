@@ -39,23 +39,23 @@ if(action==CMD_LONG_HELP) {
 printf("Addition Test\n\n" "This command tests new addition function\n");
 return;
 }
-uint32_t delay;
-int fetch_status;
-fetch_status = fetch_uint32_arg(&delay);
-if(fetch_status) {
-// Use a default delay value
-delay = 1000;
-
-
- uint32_t user_input;
- int fetch_status;
- fetch_status = fetch_uint32_arg(&user_input);
- if(fetch_status) { 
+uint32_t user_input1;
+ int fetch_status1;
+ fetch_status1 = fetch_uint32_arg(&user_input1);
+ if(fetch_status1) {
  // Use a default value
- user_input = 2;
- }
+ user_input1 = 2;
+ } 
+
+ uint32_t user_input2;
+ int fetch_status2;
+ fetch_status2 = fetch_uint32_arg(&user_input2);
+ if(fetch_status2) {
+ // Use a default value
+ user_input2 = 0xFFFFFF;
+ } 
  
+
+printf("A2 Returned: %d\n", jp_led_demo_a2(user_input1, user_input2));
 }
-printf("A2 Returned: %d\n", jp_led_demo_a2(delay, 99));
-}
-ADD_CMD("add", AddTest,"Test the new add function")
+ADD_CMD("A2", _jp_A2, "\tA02 - Calling Functions")
