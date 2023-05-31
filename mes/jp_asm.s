@@ -44,12 +44,35 @@ count: .word 12345 @ This is an initialized 32 bit value
 @ Here is the actual jp_led_demo_a3 function
 
 jp_led_demo_a3:
-push {lr}
+push {r4-r10, lr}
 bkpt
 
+mov r4, r0
+mov r5, r1
+mov r6, r2
+mov r7, #0
 
+start_game:
+    ldrb r8, [r5, r7]
+    
+
+    mov r1, r8
+    cbz r1, exit_A3
+
+    sub r8, r8, #48
+
+    mov r0, r8
+    bl BSP_LED_Toggle
+
+    
+    add r7, r7, #1
+    b start_game
+
+exit_A3:
+
+mov r0, #0
+pop {r4-r10, lr}
 bx lr
-pop {lr}
 .size jp_led_demo_a3, .-jp_led_demo_a3 @@ - symbol size (not strictly required, but makes the debugger happy)
 
 
