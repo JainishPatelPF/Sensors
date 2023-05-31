@@ -51,6 +51,13 @@ mov r5, r1
 mov r6, r2
 mov r7, #0
 
+mov r9, #7
+    led_on_check_loop_A3:              
+        mov r0, r9
+        bl BSP_LED_Off 
+        subs r9, r9, #1                     
+        bge led_on_check_loop_A3    
+
 start_game:
     ldrb r8, [r5, r7] @loading first number for light on
     
