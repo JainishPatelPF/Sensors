@@ -45,7 +45,6 @@ count: .word 12345 @ This is an initialized 32 bit value
 
 jp_led_demo_a3:
 push {r4-r10, lr}
-bkpt
 
 mov r4, r0
 mov r5, r1
@@ -53,22 +52,70 @@ mov r6, r2
 mov r7, #0
 
 start_game:
-    ldrb r8, [r5, r7]
+    ldrb r8, [r5, r7] @loading first number for light on
     
+    mov r1, r8                      @cbz requires low register
+    cbz r1, lose_game               @loses if it is zero
 
-    mov r1, r8
-    cbz r1, exit_A3
+    sub r8, r8, #48                 @if not zero converts to decimal from ascii
 
-    sub r8, r8, #48
+    mov r0, r8                      @r8 to r0 for led on
+    bl BSP_LED_On                   @turns selected led on
 
-    mov r0, r8
-    bl BSP_LED_Toggle
+    mov r0, r4
+    bl busy_delay
 
+    check_user_btn_press:
+        bl BSP_PB_GetState
+        
+        cmp r0, #1
+        beq win_game
     
-    add r7, r7, #1
-    b start_game
+    mov r0, r8                      @r8 to r0 for led off
+    bl BSP_LED_Off               @turns selected led off
 
-exit_A3:
+    mov r0, r4
+    bl busy_delay
+
+    add r7, r7, #1                  @adds 1 to offset index
+    b start_game                    @loops until finished
+
+lose_game:
+    mov r0, r6
+    bl BSP_LED_On
+    b exit_A3
+
+win_game:
+    mov r0, r8                      @r8 to r0 for led off
+    bl BSP_LED_Off               @turns selected led off
+
+    mov r10, #2
+    win_loop_A3:
+        mov r9, #7
+        led_on_toggle_loop_A3:                     @this loop toggles led on until all led's are on
+            mov r0, r9
+            bl BSP_LED_On                   @toggles selected led
+            subs r9, r9, #1                     @decrements the counter
+            bge led_on_toggle_loop_A3              @checks if it greater than equal to zero
+
+        mov r0, r4                              @add delay to register 0 from r6
+        bl busy_delay                           @calls busy_delay for delay
+        
+        mov r9, #7                              @sets r7 with 7 to decrement count for led
+        led_off_toggle_loop_A3:                    @turns all leds off
+            mov r0, r9                      
+            bl BSP_LED_Off                   @toggles selected led from r0
+            subs r9, r9, #1                     @decrements the counter
+            bge led_off_toggle_loop_A3             @loops until r7 = -1
+
+        mov r0, r4                              @adds delay to register 0 from r6
+        bl busy_delay                           @calls busy_delay
+
+    subs r10, r10, #1                           @decrements the count entered by user or default - 2.
+    bgt win_loop_A3                                @it loops until r5 is greater than 0
+    b exit_A3
+
+exit_A3:                                        @exit label
 
 mov r0, #0
 pop {r4-r10, lr}

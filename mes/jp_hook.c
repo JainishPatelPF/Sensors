@@ -26,7 +26,7 @@ return;
  fetch_status_delay = fetch_uint32_arg(&user_input_delay);
  if(fetch_status_delay) {
  // Use a default value
- user_input_delay = 0xFFFFFF;
+ user_input_delay = 500;
  } 
 
 int fetch_status_pattern;
@@ -34,9 +34,7 @@ char *destptr_pattern;
 fetch_status_pattern = fetch_string_arg(&destptr_pattern);
 if(fetch_status_pattern) {
 // Default logic here
-char pattern[12];
-sprintf(pattern, "%d", 43567011);
-destptr_pattern = pattern;
+destptr_pattern = "43567011";
 }
 
 
@@ -45,11 +43,14 @@ destptr_pattern = pattern;
  fetch_status_target = fetch_uint32_arg(&user_input_target);
  if(fetch_status_target) {
  // Use a default value
- user_input_target = 2;
+ user_input_target = 5;
  } 
  
+ int final_delay = 0;
+ final_delay = user_input_delay * 1.67;
+ final_delay = final_delay * 10000; 
 
-printf("A3 Returned: %d\n", jp_led_demo_a3(user_input_delay, destptr_pattern, user_input_target));  //Prints return value from this function defined in asm file.
+printf("A3 Returned: %d\n", jp_led_demo_a3(final_delay, destptr_pattern, user_input_target));  //Prints return value from this function defined in asm file.
 }
 ADD_CMD("jpGame", _jp_A3, "\tA03 - Calling Functions") //macro command for Assignment 3. Called by : "jpGame delay pattern target"
 
