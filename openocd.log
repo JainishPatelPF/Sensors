@@ -2,16 +2,16 @@ Info : Listening on port 6666 for tcl connections
 Info : Listening on port 4444 for telnet connections
 Info : clock speed 1000 kHz
 Info : STLINK V2J37M26 (API v2) VID:PID 0483:374B
-Info : Target voltage: 2.891583
+Info : Target voltage: 2.890171
 Info : stm32f3x.cpu: hardware has 6 breakpoints, 4 watchpoints
 Info : starting gdb server for stm32f3x.cpu on pipe
 Info : accepting 'gdb' connection from pipe
 target halted due to debug-request, current mode: Thread 
-xPSR: 0x21010000 pc: 0x080081d4 msp: 0x20007f74
+xPSR: 0x21010000 pc: 0x0800a284 msp: 0x20007f74
 Info : device id = 0x10036422
 Info : flash size = 256kbytes
 Info : Unable to match requested speed 1000 kHz, using 950 kHz
 Info : Unable to match requested speed 1000 kHz, using 950 kHz
 target halted due to debug-request, current mode: Thread 
-xPSR: 0x01000000 pc: 0x0800c784 msp: 0x20008000
+xPSR: 0x01000000 pc: 0x0800e834 msp: 0x20008000
 Info : dropped 'gdb' connection

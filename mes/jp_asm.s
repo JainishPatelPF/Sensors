@@ -23,6 +23,38 @@ count: .word 12345 @ This is an initialized 32 bit value
 .text
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Assignments & Labs From Here @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
+
+@@ Function Header Block
+.align 2 @ Code alignment - 2^n alignment (n=2)
+@ This causes the assembler to use 4 byte alignment
+.syntax unified @ Sets the instruction set to the new unified ARM + THUMB
+@ instructions. The default is divided (separate instruction sets)
+.global jp_led_demo_a3 @ Make the symbol name for the function visible to the linker
+.code 16 @ 16bit THUMB code (BOTH .code and .thumb_func are required)
+.thumb_func @ Specifies that the following symbol is the name of a THUMB 
+
+@ encoded function. Necessary for interlinking between ARM and THUMB code.
+.type jp_led_demo_a3, %function @ Declares that the symbol is a function (not strictly required)
+
+@ Function Declaration : int jp_led_demo_a3(int delay, char* pattern, int target)
+@
+@ Input: delay, pattern, target
+@ Returns: r0
+@
+@ Here is the actual jp_led_demo_a3 function
+
+jp_led_demo_a3:
+push {lr}
+bkpt
+
+
+bx lr
+pop {lr}
+.size jp_led_demo_a3, .-jp_led_demo_a3 @@ - symbol size (not strictly required, but makes the debugger happy)
+
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Past Assignments & Labs @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
 @ assembly language instructions - Code section (text -> ROM)
 
 @@ Function Header Block
@@ -81,8 +113,6 @@ bx lr
 .size jp_led_demo_a2, .-jp_led_demo_a2 @@ - symbol size (not strictly required, but makes the debugger happy)
 
 
-
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Past Assignments & Labs @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 @@ Function Header Block
 .align 2 @ Code alignment - 2^n alignment (n=2)

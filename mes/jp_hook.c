@@ -6,11 +6,63 @@
 #include <stdint.h>
 #include <ctype.h>
 #include "common.h"
+#include <string.h>
 
 int add_test(int x, int y, int del);
 
 int jp_led_demo_a2(int count, int delay);       //function declaration for assignment 2 defined in asm file.
 
+int jp_led_demo_a3(int delay, char* pattern, int target); //function declaration for assignment 3
+
+void _jp_A3(int action)
+{
+if(action==CMD_SHORT_HELP) return;
+if(action==CMD_LONG_HELP) {
+printf("Assignment 3\n\n" "This command is used for Assignment 3.\n");
+return;
+}
+ uint32_t user_input_delay;                                                  //User Input block 1 for Delay
+ int fetch_status_delay;
+ fetch_status_delay = fetch_uint32_arg(&user_input_delay);
+ if(fetch_status_delay) {
+ // Use a default value
+ user_input_delay = 0xFFFFFF;
+ } 
+
+int fetch_status_pattern;
+char *destptr_pattern;
+fetch_status_pattern = fetch_string_arg(&destptr_pattern);
+if(fetch_status_pattern) {
+// Default logic here
+char pattern[12];
+sprintf(pattern, "%d", 43567011);
+destptr_pattern = pattern;
+}
+
+
+ uint32_t user_input_target;                                                   //User Input block 1 for target
+ int fetch_status_target;
+ fetch_status_target = fetch_uint32_arg(&user_input_target);
+ if(fetch_status_target) {
+ // Use a default value
+ user_input_target = 2;
+ } 
+ 
+
+printf("A3 Returned: %d\n", jp_led_demo_a3(user_input_delay, destptr_pattern, user_input_target));  //Prints return value from this function defined in asm file.
+}
+ADD_CMD("jpGame", _jp_A3, "\tA03 - Calling Functions") //macro command for Assignment 3. Called by : "jpGame delay pattern target"
+
+
+
+
+
+
+
+
+
+
+////////////////////////////////////////// Past Assignments & Labs ////////////////////////////////////////
 
 void AddTest(int action)
 {
