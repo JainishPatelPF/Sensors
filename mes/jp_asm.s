@@ -79,7 +79,8 @@ start_game:
         bne continue_check          @if not pressed gets out of the loop
 
         cmp r8, r6                  @if the button is pressed it compares for the target led
-        beq win_game                @if equal the win lights are turned on
+        bne lose_game               @if equal the win lights are turned on
+        b win_game
     
     continue_check:
         mov r0, r8                      @r8 to r0 for led off
@@ -92,8 +93,12 @@ start_game:
         b start_game                    @loops until finished
 
 lose_game:                              @for lose lights
+    mov r0, r8                          @to turn selected led off
+    bl BSP_LED_Off                      @selected led off
+
     mov r0, r6                          @sets the target light to r0
     bl BSP_LED_On                       @makes the target light on if lose
+    
     b exit_A3                           @and exits
 
 win_game:
