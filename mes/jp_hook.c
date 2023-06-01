@@ -14,6 +14,12 @@ int jp_led_demo_a2(int count, int delay);       //function declaration for assig
 
 int jp_led_demo_a3(int delay, char* pattern, int target); //function declaration for assignment 3
 
+
+// Funtion Name: _jp_A3(int)
+// Function Parameters: action
+// Function Description: This is the function used for Assignment 3 and This function gets three parameters from UI and sends it to the asm file.
+// Fetch_uint32_arg gets two parameters : delay and target, fetch_string_arg gets one parameter: pattern
+
 void _jp_A3(int action)
 {
 if(action==CMD_SHORT_HELP) return;
@@ -21,34 +27,35 @@ if(action==CMD_LONG_HELP) {
 printf("Assignment 3\n\n" "This command is used for Assignment 3.\n");
 return;
 }
- uint32_t user_input_delay;                                                  //User Input block 1 for Delay
+ uint32_t user_input_delay;                                                  //User Input block for Delay
  int fetch_status_delay;
  fetch_status_delay = fetch_uint32_arg(&user_input_delay);
  if(fetch_status_delay) {
  // Use a default value
- user_input_delay = 500;
+ user_input_delay = 500;                                        //default is 500ms
  } 
 
-int fetch_status_pattern;
+int fetch_status_pattern;                                                   //User Input block for pattern
 char *destptr_pattern;
 fetch_status_pattern = fetch_string_arg(&destptr_pattern);
 if(fetch_status_pattern) {
 // Default logic here
-destptr_pattern = "43567011";
+destptr_pattern = "43567011";                                   //default is "43567011"
 }
 
 
- uint32_t user_input_target;                                                   //User Input block 1 for target
+ uint32_t user_input_target;                                                   //User Input block for target
  int fetch_status_target;
  fetch_status_target = fetch_uint32_arg(&user_input_target);
  if(fetch_status_target) {
  // Use a default value
- user_input_target = 5;
+ user_input_target = 5;                                         //default target light is 5
  } 
  
- int final_delay = 0;
- final_delay = user_input_delay * 1.67;
- final_delay = final_delay * 10000; 
+ //scaling delay 
+ int final_delay = 0;                           //stores final delay
+ final_delay = user_input_delay * 1.67;         //delay conversion ratio multiplied with delay
+ final_delay = final_delay * 10000;             //and finally multiplying with 10000 to get actual delay
 
 printf("A3 Returned: %d\n", jp_led_demo_a3(final_delay, destptr_pattern, user_input_target));  //Prints return value from this function defined in asm file.
 }
@@ -89,7 +96,7 @@ ADD_CMD("add", AddTest,"Test the new add function")
 // Funtion Name: _jp_A2(int)
 // Function Parameters: action
 // Function Description: This is the function used for Assignment 2 and This function gets two parameters from UI and sends it to the asm file.
- // Fetch_uint32_arg gets two parameters : count and delay
+// Fetch_uint32_arg gets two parameters : count and delay
 
 
 void _jp_A2(int action)
