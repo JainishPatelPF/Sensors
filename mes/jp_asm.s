@@ -62,7 +62,7 @@ start_game:
     ldrb r8, [r5, r7]               @loading first number for light on, the offset is increased gradually
     
     mov r1, r8                      @mov operation because cbz requires low register
-    cbz r1, lose_game               @loses if it is zero it means end of pattern
+    cbz r1, Loop_again               @loses if it is zero it means end of pattern
 
     sub r8, r8, #48                 @if not zero converts to decimal from ascii
 
@@ -91,6 +91,10 @@ start_game:
 
         add r7, r7, #1                  @adds 1 to offset index
         b start_game                    @loops until finished
+
+Loop_again:
+    mov r7, #0
+    b start_game
 
 lose_game:                              @for lose lights
     mov r0, r8                          @to turn selected led off
