@@ -2,16 +2,62 @@ Info : Listening on port 6666 for tcl connections
 Info : Listening on port 4444 for telnet connections
 Info : clock speed 1000 kHz
 Info : STLINK V2J37M26 (API v2) VID:PID 0483:374B
-Info : Target voltage: 2.896991
+Info : Target voltage: 2.886772
 Info : stm32f3x.cpu: hardware has 6 breakpoints, 4 watchpoints
 Info : starting gdb server for stm32f3x.cpu on pipe
 Info : accepting 'gdb' connection from pipe
 target halted due to debug-request, current mode: Thread 
-xPSR: 0x21010000 pc: 0x08009c54 msp: 0x20007fb0
+xPSR: 0x21010000 pc: 0x08007c54 msp: 0x20007fb0
 Info : device id = 0x10036422
 Info : flash size = 256kbytes
 Info : Unable to match requested speed 1000 kHz, using 950 kHz
 Info : Unable to match requested speed 1000 kHz, using 950 kHz
 target halted due to debug-request, current mode: Thread 
-xPSR: 0x01000000 pc: 0x0800e8cc msp: 0x20008000
+xPSR: 0x01000000 pc: 0x0800c920 msp: 0x20008000
+Info : halted: PC: 0x0800024c
+Info : halted: PC: 0x0800024e
+Info : halted: PC: 0x08000252
+Info : halted: PC: 0x08000256
+Info : halted: PC: 0x0800025a
+Info : halted: PC: 0x0800025c
+Info : halted: PC: 0x0800025e
+Info : halted: PC: 0x08000262
+Info : halted: PC: 0x08000266
+Info : halted: PC: 0x0800026a
+Info : halted: PC: 0x0800026e
+Info : halted: PC: 0x08000270
+Info : halted: PC: 0x08000272
+Info : halted: PC: 0x0800027c
+Info : halted: PC: 0x08000280
+Info : halted: PC: 0x08000284
+Info : halted: PC: 0x08007cbe
+Info : halted: PC: 0x08007cc0
+Info : halted: PC: 0x08007cc2
+Info : halted: PC: 0x08000970
+Info : halted: PC: 0x08007cc8
+Info : halted: PC: 0x08007f22
+Info : halted: PC: 0x0800024c
+Info : halted: PC: 0x0800024e
+Info : halted: PC: 0x08000252
+Info : halted: PC: 0x08000256
+Info : halted: PC: 0x0800025a
+Info : halted: PC: 0x0800025c
+Info : halted: PC: 0x0800025e
+Info : halted: PC: 0x08000262
+Info : halted: PC: 0x08000266
+Info : halted: PC: 0x0800026a
+Info : halted: PC: 0x0800026e
+Info : halted: PC: 0x08000270
+Info : halted: PC: 0x08000274
+Info : halted: PC: 0x08000276
+Info : halted: PC: 0x08000278
+Info : halted: PC: 0x0800bc3c
+Info : halted: PC: 0x08000280
+Info : halted: PC: 0x08000284
+Info : halted: PC: 0x08007cbe
+Info : halted: PC: 0x08007cc0
+Info : halted: PC: 0x08007cc2
+Info : halted: PC: 0x08000970
+Info : halted: PC: 0x08007cc8
+Info : halted: PC: 0x08007f22
 Info : dropped 'gdb' connection

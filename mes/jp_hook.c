@@ -14,6 +14,59 @@ int jp_led_demo_a2(int count, int delay);       //function declaration for assig
 
 int jp_led_demo_a3(int delay, char* pattern, int target); //function declaration for assignment 3
 
+int jp_led_demo_a4(int delay, int target_light, int game_time); //function declaration for assignment 3
+
+
+// Funtion Name: _jp_A4(int)
+// Function Parameters: action
+// Function Description: This is the function used for Assignment 4 and This function gets three parameters from UI and sends it to the asm file.
+// Fetch_uint32_arg gets three parameters : delay, target, and light_time
+
+void _jp_A4(int action)
+{
+if(action==CMD_SHORT_HELP) return;
+if(action==CMD_LONG_HELP) {
+printf("Assignment 4\n\n" "This command is used for Assignment 4.\n");
+return;
+}
+ uint32_t user_input_delay;                                                  //User Input block for Delay
+ int fetch_status_delay;
+ fetch_status_delay = fetch_uint32_arg(&user_input_delay);
+ if(fetch_status_delay) {
+ // Use a default value
+ user_input_delay = 500;                                        //default is 500ms
+ } 
+
+ uint32_t user_input_target;                                                   //User Input block for target_light
+ int fetch_status_target;
+ fetch_status_target = fetch_uint32_arg(&user_input_target);
+ if(fetch_status_target) {
+ // Use a default value
+ user_input_target = 5;                                         //default target light is 5
+ } 
+ 
+ uint32_t user_input_target_game_time;                                                   //User Input block for target game_time
+ int fetch_status_target_game_time;
+ fetch_status_target_game_time = fetch_uint32_arg(&user_input_target_game_time);
+ if(fetch_status_target_game_time) {
+ // Use a default value
+ user_input_target_game_time = 30;                                         //default target game_time is 30
+ } 
+
+printf("A4 Returned: %d\n", jp_led_demo_a4(user_input_delay, user_input_target, user_input_target_game_time));  //Prints return value from this function defined in asm file.
+}
+ADD_CMD("jpTilt", _jp_A4, "\tA04 - BLINKING LIGHTS AND SENSORS") //macro command for Assignment 4. Called by : "jpTilt delay target Game_time"
+
+
+
+
+
+
+
+
+
+
+////////////////////////////////////////// Past Assignments & Labs ////////////////////////////////////////
 
 // Funtion Name: _jp_A3(int)
 // Function Parameters: action
@@ -64,13 +117,6 @@ ADD_CMD("jpGame", _jp_A3, "\tA03 - Calling Functions") //macro command for Assig
 
 
 
-
-
-
-
-
-
-////////////////////////////////////////// Past Assignments & Labs ////////////////////////////////////////
 
 void AddTest(int action)
 {

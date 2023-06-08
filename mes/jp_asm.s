@@ -18,10 +18,78 @@ big: .word 0xAAAABBBB
 num: .byte 0xAB
 str2: .asciz "Hallo Welt!"
 count: .word 12345 @ This is an initialized 32 bit value
+game_time: .word 0 @holds game time for A4
+game_delay: .word 0 @holds game delay for A4
+game_light: .word 0 @holds game target for A4
+mili_secs: .word 1000 @holds multiplication value for game time
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 .text
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Assignments & Labs From Here @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+
+@@ Function Header Block
+.align 2 @ Code alignment - 2^n alignment (n=2)
+@ This causes the assembler to use 4 byte alignment
+.syntax unified @ Sets the instruction set to the new unified ARM + THUMB
+@ instructions. The default is divided (separate instruction sets)
+.global jp_led_demo_a4 @ Make the symbol name for the function visible to the linker
+.code 16 @ 16bit THUMB code (BOTH .code and .thumb_func are required)
+.thumb_func @ Specifies that the following symbol is the name of a THUMB 
+
+@ encoded function. Necessary for interlinking between ARM and THUMB code.
+.type jp_led_demo_a4, %function @ Declares that the symbol is a function (not strictly required)
+
+@ Function Declaration : int jp_led_demo_a4(int delay, int target_light, int game_time)
+@
+@ Input: delay, target, game_time
+@ Returns: r0
+@
+@ Here is the actual jp_led_demo_a4 function
+
+jp_led_demo_a4:
+
+push {r4-r10, lr}
+
+mov r10, r0
+
+ldr r9, =game_light
+str r1, [r9]
+
+ldr r8, =game_time
+ldr r7, =mili_secs
+ldr r1, [r7]
+mul r2, r2, r1
+str r2, [r8]
+
+A4_start_game:                      @start of the game
+    check_game_time:                
+        ldr r8, =game_time
+        ldr r4, [r8]
+        cmp r4, #0
+        beq A4_lose_game
+        b End
+
+A4_lose_game:                   @this makes the target light on after losing
+ldr r4, =game_light
+ldr r0, [r4]
+bl BSP_LED_On
+
+
+End:
+mov r0, #0                      @denotes Success
+pop {r4-r10, lr}
+bx lr
+
+.size jp_led_demo_a4, .-jp_led_demo_a4 @@ - symbol size (not strictly required, but makes the debugger happy)
+
+
+
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Past Assignments & Labs @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+@ assembly language instructions - Code section (text -> ROM)
+
 
 
 @@ Function Header Block
@@ -143,9 +211,7 @@ bx lr
 .size jp_led_demo_a3, .-jp_led_demo_a3 @@ - symbol size (not strictly required, but makes the debugger happy)
 
 
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Past Assignments & Labs @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-@ assembly language instructions - Code section (text -> ROM)
 
 @@ Function Header Block
 .align 2 @ Code alignment - 2^n alignment (n=2)
