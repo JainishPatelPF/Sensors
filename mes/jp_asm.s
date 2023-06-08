@@ -62,27 +62,266 @@ ldr r1, [r7]
 mul r2, r2, r1
 str r2, [r8]
 
-A4_start_game:                      @start of the game
+A4_start_game:                                 @ start of the game
     check_game_time:                
         ldr r8, =game_time
         ldr r4, [r8]
         cmp r4, #0
         beq A4_lose_game
-        b End
+        
+        logic_loop:
+            ldr r4, =game_light
+            ldr r3, [r4]
 
-A4_lose_game:                   @this makes the target light on after losing
+            bl A4_get_accel_values              @ reads the accelerometer, led value is returned
+            
+            cmp r0, r3
+            beq continue_game
+            b check_game_time
+            continue_game:
+                ldr r4, =game_delay
+                mov r1, r10
+
+                ldr r3, [r4]
+                cmp r3, #0
+                bne check_delay
+                str r1, [r4]                   @loads delay
+                
+                check_delay:                   @checks for delay = 0
+                    ldr r4, =game_delay
+                    ldr r3, [r4]
+                    cmp r3, #0
+                    beq A4_win_game
+
+        b A4_start_game
+
+A4_lose_game:                                  @this makes the target light on after losing
 ldr r4, =game_light
 ldr r0, [r4]
 bl BSP_LED_On
+b a4_End
 
+A4_win_game:
+mov r10, #2                                    @counter for win lights blink twice
+win_loop_A4:
+    mov r9, #7                                 @led counter
+    led_on_toggle_loop_A4:                     @this loop toggles led on until all led's are on
+        mov r0, r9
+        bl BSP_LED_On                          @toggles selected led
+        subs r9, r9, #1                        @decrements the counter
+        bge led_on_toggle_loop_A4              @checks if it greater than equal to zero
 
-End:
-mov r0, #0                      @denotes Success
+    mov r0, #500                               @add delay to register 0 from r4
+    bl busy_delay                              @calls busy_delay for delay
+    
+    mov r9, #7                                 @led counter
+    led_off_toggle_loop_A4:                    @turns all leds off
+        mov r0, r9                      
+        bl BSP_LED_Off                         @selected led off from r0
+        subs r9, r9, #1                        @decrements the counter
+        bge led_off_toggle_loop_A4             @loops until r9>=0
+
+    mov r0, #500                               @add delay to register 0 from r4
+    bl busy_delay                              @calls busy_delay
+
+subs r10, r10, #1                              @decrements the cycle count.
+bgt win_loop_A4                                @it loops until r10 is greater than 0
+b a4_End
+
+a4_End:
+mov r0, #0                                     @denotes Success
 pop {r4-r10, lr}
 bx lr
 
 .size jp_led_demo_a4, .-jp_led_demo_a4 @@ - symbol size (not strictly required, but makes the debugger happy)
 
+
+@@ Function Header Block
+.align 2 @ Code alignment - 2^n alignment (n=2)
+@ This causes the assembler to use 4 byte alignment
+.syntax unified @ Sets the instruction set to the new unified ARM + THUMB
+@ instructions. The default is divided (separate instruction sets)
+.global A4_get_accel_values @ Make the symbol name for the function visible to the linker
+.code 16 @ 16bit THUMB code (BOTH .code and .thumb_func are required)
+.thumb_func @ Specifies that the following symbol is the name of a THUMB 
+
+@ encoded function. Necessary for interlinking between ARM and THUMB code.
+.type A4_get_accel_values, %function @ Declares that the symbol is a function (not strictly required)
+
+@ Function Declaration : int A4_get_accel_values(void)
+@
+@ Input: void
+@ Returns: selected led value
+@
+@ Here is the actual A4_get_accel_values function
+
+@ constants are declared here:
+.equ I2C_add, 0x32 
+.equ X_Lo, 0x28
+.equ X_Hi, 0x29
+.equ Y_Lo, 0x2A
+.equ Y_Hi, 0x2B 
+.equ read_delay, 0xFFFFFF
+
+A4_get_accel_values:
+push {r4, r5, lr}
+mov r0, #I2C_add				@stores I2C address to r0
+mov r1, #X_Hi					@stores x_hi value to r1
+bl COMPASSACCELERO_IO_Read		@calls COMPASSACCELERO_IO_Read to get X_HI value
+
+sxtb r0,r0						@Converts from 8 bit to 32 bit
+mov r4, r0						@moves r0 to r4
+
+mov r0, #I2C_add				@stores I2c address to r0
+mov r1, #Y_Hi					@stores y_hi value to r1
+bl COMPASSACCELERO_IO_Read		@calls COMPASSACCELERO_IO_Read to get Y_HI value
+
+sxtb r0, r0						@coverts into 32 bit
+mov r5, r0						@stores it in r5
+
+Loop_1:							@this loop turns on led 0 and 7
+    cmp r4, #-15				@compares r4 with -15
+    ble Loop_2					@if less than equal it goes to loop 2
+    cmp r4, #14					
+    bgt Loop_2					@if greater than equal goes to loop 2
+    body:						@ body of loop
+        cmp r5, #-29			@comparision 
+        bgt next				@if greater than -29 jumps to next
+        b Led_0					@turns led 0 from Led_0 label
+        next:					@another condition
+            cmp r5, #30			
+            ble Loop_2
+            b Led_7				@turns led 7 on
+Loop_2:							@this loop turns on led 1 and 5
+    cmp r4, #-30
+    ble Loop_3					@if condition does not meets jumps to loop_3
+    cmp r4, #-14
+    bgt Loop_3					@if condition does not meets jumps to loop_3
+    body_2:						@condition body
+        cmp r5, #-30		
+        ble next_2				@@if condition does not meets jumps to next_2
+        cmp r5, #-14
+        bgt next_2				@@if condition does not meets jumps to next_2
+        b Led_1					@if condition meets toggles led 1
+        next_2:					@another condition if first one is not meets
+            cmp r5, #15
+            ble Loop_3			@if condition does not meets jumps to loop_3
+            cmp r5, #29
+            bgt Loop_3			@if condition does not meets jumps to loop_3
+            b Led_5				@if condition meets toggles led 5
+Loop_3:							@this loop turns on led 2 and 6
+    cmp r4, #15
+    ble Loop_4					@if condition does not meets jumps to loop_4	
+    cmp r4, #29
+    bgt Loop_4					@if condition does not meets jumps to loop_4 
+    body_3:						@condition body
+        cmp r5, #-30
+        ble next_3				@if condition does not meets jumps to next_3
+        cmp r5, #-14
+        bgt next_3				@if condition does not meets jumps to next_3
+        b Led_2					@if condition meets toggles led 2			
+        next_3:					@another condition
+            cmp r5, #15
+            ble Loop_4			@if condition does not meets jumps to loop_4
+            cmp r5, #29
+            bgt Loop_4			@if condition does not meets jumps to Loop_4
+            b Led_6				@if condition meets turns on led 6 
+Loop_4:						@this loop turns on led 3 and 4
+    cmp r5, #-15
+    ble End					@if condition does not meets jumps to end 
+    cmp r5, #14
+    bgt End					@if condition does not meets jumps to end
+    body_4:					@condition body
+        cmp r4, #-29
+        bgt next_4			@if condition does not meets jumps to next condition
+        b Led_3				@turns led 3 on
+        next_4:				@another condition
+            cmp r4, #30
+            ble End			@if condition does not meets jumps to End
+            b Led_4			@turns led 4 on
+
+Led_0:						@to turn desired led on
+    mov r0, #0
+    bl BSP_LED_On			@turns led on
+    mov r0, #500    		@adds delay for 0.5 second
+    bl busy_delay			@calls busy delay
+    mov r0, #0				
+    bl BSP_LED_Off			@makes led off
+    mov r0, #0
+    b End
+Led_7:
+    mov r0, #7
+    bl BSP_LED_On 			@turns led on
+    mov r0, #500    		@adds delay for 0.5 second
+    bl busy_delay			@calls busy delay
+    mov r0, #7
+    bl BSP_LED_Off			@makes led off
+    mov r0, #7
+    b End
+Led_1:
+    mov r0, #1
+    bl BSP_LED_On			@makes led on
+    mov r0, #500    		@adds delay for 0.5 second
+    bl busy_delay			@calls busy delay
+    mov r0, #1
+    bl BSP_LED_Off			@makes led off
+    mov r0, #1
+    b End
+Led_5:
+    mov r0, #5
+    bl BSP_LED_On			@makes led on
+    mov r0, #500    		@adds delay for 0.5 second
+    bl busy_delay			@calls busy delay
+    mov r0, #5
+    bl BSP_LED_Off			@makes led off
+    mov r0, #5
+    b End
+Led_2:
+    mov r0, #2
+    bl BSP_LED_On			@makes led on
+    mov r0, #500			@delays by 0.5 second
+    bl busy_delay			@adds busy delay
+    mov r0, #2
+    bl BSP_LED_Off			@turns off led 
+    mov r0, #2
+    b End
+Led_3:
+    mov r0, #3
+    bl BSP_LED_On 			@makes led on
+    mov r0, #500			@delays by 0.5 second
+    bl busy_delay
+    mov r0, #3
+    bl BSP_LED_Off			@turns led off
+    mov r0, #3
+    b End
+Led_4:
+    mov r0, #4
+    bl BSP_LED_On			@makes led on
+    mov r0, #500			@adds delay
+    bl busy_delay			@calls delay
+    mov r0, #4
+    bl BSP_LED_Off			@turns led off
+    mov r0, #4
+    b End
+Led_6:
+    mov r0, #6
+    bl BSP_LED_On			@turns led on
+    mov r0, #500			@adds delay	
+    bl busy_delay			@calls delay
+    mov r0, #6	
+    bl BSP_LED_Off 			@turns led off
+    mov r0, #6
+    b End						@branches to end if its an end
+
+
+End:							@end label
+
+pop {r4, r5, lr}
+bx lr
+
+
+
+.size A4_get_accel_values, .-A4_get_accel_values @@ - symbol size (not strictly required, but makes the debugger happy)
 
 
 
