@@ -14,13 +14,13 @@ int jp_led_demo_a2(int count, int delay);       //function declaration for assig
 
 int jp_led_demo_a3(int delay, char* pattern, int target); //function declaration for assignment 3
 
-int jp_led_demo_a4(int delay, int target_light, int game_time); //function declaration for assignment 3
+int jp_led_demo_a4(int delay, int target_light, int game_time); //function declaration for assignment 4
 
 
 // Funtion Name: _jp_A4(int)
 // Function Parameters: action
 // Function Description: This is the function used for Assignment 4 and This function gets three parameters from UI and sends it to the asm file.
-// Fetch_uint32_arg gets three parameters : delay, target, and light_time
+// Fetch_uint32_arg gets three parameters : delay, target, and game_time
 
 void _jp_A4(int action)
 {
@@ -56,14 +56,6 @@ return;
 printf("A4 Returned: %d\n", jp_led_demo_a4(user_input_delay, user_input_target, user_input_target_game_time));  //Prints return value from this function defined in asm file.
 }
 ADD_CMD("jpTilt", _jp_A4, "\tA04 - BLINKING LIGHTS AND SENSORS") //macro command for Assignment 4. Called by : "jpTilt delay target Game_time"
-
-
-
-
-
-
-
-
 
 
 ////////////////////////////////////////// Past Assignments & Labs ////////////////////////////////////////

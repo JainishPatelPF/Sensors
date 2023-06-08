@@ -74,22 +74,22 @@ f1e0f85f l       *ABS*	00000000 BootRAM
 0000002a l       *ABS*	00000000 Y_Lo
 0000002b l       *ABS*	00000000 Y_Hi
 00ffffff l       *ABS*	00000000 read_delay
-0800034e l       .text	00000000 Loop_1
-08000376 l       .text	00000000 Loop_2
+0800034e l       .text	00000000 Condition_1
+08000376 l       .text	00000000 Condition_2
 08000358 l       .text	00000000 body
 08000368 l       .text	00000000 next
 08000402 l       .text	00000000 End
-080003aa l       .text	00000000 Loop_3
+080003aa l       .text	00000000 Condition_3
 08000382 l       .text	00000000 body_2
 08000398 l       .text	00000000 next_2
-080003da l       .text	00000000 Loop_4
+080003da l       .text	00000000 Condition_4
 080003b2 l       .text	00000000 body_3
 080003c8 l       .text	00000000 next_3
 080003e4 l       .text	00000000 body_4
 080003f4 l       .text	00000000 next_4
 08000430 l       .text	00000000 Game_timer
-08000438 l       .text	00000000 game_count
 08000442 l       .text	00000000 end_game_timer
+08000438 l       .text	00000000 game_count
 08000450 l       .text	00000000 Game_delay
 08000462 l       .text	00000000 end_game_delay
 08000458 l       .text	00000000 game_delay_count
@@ -1466,7 +1466,7 @@ Disassembly of section .text:
  8000244:	0800cb90 	.word	0x0800cb90
 
 08000248 <jp_led_demo_a4>:
-@
+@ Returns: r0 ~ Means Success
 @ Here is the actual jp_led_demo_a4 function
 
 jp_led_demo_a4:
@@ -1474,116 +1474,115 @@ jp_led_demo_a4:
 push {r4-r10, lr}
  8000248:	e92d 47f0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
 
-mov r10, r0
+mov r10, r0                                     @holds delay, moved to r10
  800024c:	4682      	mov	sl, r0
-ldr r6, =actual_delay
+ldr r6, =actual_delay                           @r6 will hold the address of the actual_delay Variable
  800024e:	4eea      	ldr	r6, [pc, #936]	; (80005f8 <delay_1oop+0xc>)
-str r10, [r6]
+str r10, [r6]                                   @copying value of delay to the global variable
  8000250:	f8c6 a000 	str.w	sl, [r6]
 
-ldr r9, =game_light
+ldr r9, =game_light                             @holds the address of the global var: game_light
  8000254:	f8df 93a4 	ldr.w	r9, [pc, #932]	; 80005fc <delay_1oop+0x10>
-str r1, [r9]
+str r1, [r9]                                    @moves the value of target light to global variable
  8000258:	f8c9 1000 	str.w	r1, [r9]
 
-ldr r8, =game_time
+ldr r8, =game_time                              @r8 will hold the address of game_time 
  800025c:	f8df 83a0 	ldr.w	r8, [pc, #928]	; 8000600 <delay_1oop+0x14>
-ldr r7, =mili_secs
+ldr r7, =mili_secs                              @r7 will hold the address of mili_secs
  8000260:	4fe8      	ldr	r7, [pc, #928]	; (8000604 <delay_1oop+0x18>)
-ldr r1, [r7]
+ldr r1, [r7]                                    @getting value from the address
  8000262:	6839      	ldr	r1, [r7, #0]
-mul r2, r2, r1
+mul r2, r2, r1                                  @multiplying it with the entered game_time
  8000264:	fb02 f201 	mul.w	r2, r2, r1
-str r2, [r8]
+str r2, [r8]                                    @storing the multiplied value to the global variable
  8000268:	f8c8 2000 	str.w	r2, [r8]
 
-mov r9, #7                          @Stores the led's index
+mov r9, #7                                      @Stores the led's index
  800026c:	f04f 0907 	mov.w	r9, #7
 
 08000270 <led_on_check_loop_A4>:
-    led_on_check_loop_A4:           @used to turn off all leds on start/Restart
+led_on_check_loop_A4:                           @used to turn off all leds on start/Restart
         mov r0, r9                  
  8000270:	4648      	mov	r0, r9
-        bl BSP_LED_Off              @Turns off selected led
+        bl BSP_LED_Off                          @Turns off selected led
  8000272:	f00b fdf5 	bl	800be60 <BSP_LED_Off>
-        subs r9, r9, #1             @decrements the led counter
+        subs r9, r9, #1                         @decrements the led counter
  8000276:	f1b9 0901 	subs.w	r9, r9, #1
-        bge led_on_check_loop_A4    @loops back until greater than equal to zero
+        bge led_on_check_loop_A4                @loops back until greater than equal to zero
  800027a:	daf9      	bge.n	8000270 <led_on_check_loop_A4>
 
 0800027c <A4_start_game>:
 
-A4_start_game:                                 @ start of the game
+A4_start_game:                                  @start of the game
     check_game_time:                
-        ldr r8, =game_time
+        ldr r8, =game_time                      @loads the address of game_time
  800027c:	f8df 8380 	ldr.w	r8, [pc, #896]	; 8000600 <delay_1oop+0x14>
-        ldr r4, [r8]
+        ldr r4, [r8]                            @getting the value from the address
  8000280:	f8d8 4000 	ldr.w	r4, [r8]
-        cmp r4, #0
+        cmp r4, #0                              @comparing it with 0
  8000284:	2c00      	cmp	r4, #0
-        beq A4_lose_game
+        beq A4_lose_game                        @if 0 branches to lose
  8000286:	d01b      	beq.n	80002c0 <A4_lose_game>
 
 08000288 <logic_loop>:
         
         logic_loop:
-            ldr r9, =game_light
+            ldr r9, =game_light                 @loads the address of the game_light variable
  8000288:	f8df 9370 	ldr.w	r9, [pc, #880]	; 80005fc <delay_1oop+0x10>
-            ldr r4, [r9]
+            ldr r4, [r9]                        @loads the value from the address
  800028c:	f8d9 4000 	ldr.w	r4, [r9]
             
-            bl A4_get_accel_values             @reads the accelerometer, led value is returned
+            bl A4_get_accel_values              @reads the accelerometer, led value is returned
  8000290:	f000 f84c 	bl	800032c <A4_get_accel_values>
             
-            cmp r0, r4
+            cmp r0, r4                          @compares the value with the target led
  8000294:	42a0      	cmp	r0, r4
-            beq continue_game
+            beq continue_game                   @if equal branches to continue the game
  8000296:	d000      	beq.n	800029a <continue_game>
-            
-            b reset_the_delay
+
+            b reset_the_delay                   @else resets the delay and counter and checks again for the led.
  8000298:	e017      	b.n	80002ca <reset_the_delay>
 
 0800029a <continue_game>:
+
             continue_game:
-                
-                ldr r6, =count
+                ldr r6, =count                  @loads the count address
  800029a:	4edb      	ldr	r6, [pc, #876]	; (8000608 <delay_1oop+0x1c>)
-                ldr r0, [r6]
+                ldr r0, [r6]                    @loads the count value
  800029c:	6830      	ldr	r0, [r6, #0]
-                cmp r0, #0
+                cmp r0, #0                      @compares it with 0
  800029e:	2800      	cmp	r0, #0
-                bne check_delay
+                bne check_delay                 @if !=0 branches to check the delay = 0, else loads the delay
  80002a0:	d109      	bne.n	80002b6 <check_delay>
 
-                ldr r4, =game_delay
+                ldr r4, =game_delay             @loads the delay address
  80002a2:	4cda      	ldr	r4, [pc, #872]	; (800060c <delay_1oop+0x20>)
-                ldr r10, =actual_delay
+                ldr r10, =actual_delay          @loads the actual delay address
  80002a4:	f8df a350 	ldr.w	sl, [pc, #848]	; 80005f8 <delay_1oop+0xc>
-                ldr r0, [r10]
+                ldr r0, [r10]                   @loads the actual delay value
  80002a8:	f8da 0000 	ldr.w	r0, [sl]
-                str r0, [r4]                  @loads delay
+                str r0, [r4]                    @loads delay to start counting delay
  80002ac:	6020      	str	r0, [r4, #0]
 
-                @just checking
-                ldr r6, =count
+                ldr r6, =count                  @loads the count address
  80002ae:	4ed6      	ldr	r6, [pc, #856]	; (8000608 <delay_1oop+0x1c>)
-                mov r0, #1
+                mov r0, #1                      @moves the value #1 to r0
  80002b0:	f04f 0001 	mov.w	r0, #1
-                str r0, [r6]
+                str r0, [r6]                    @updates the count value to 1
  80002b4:	6030      	str	r0, [r6, #0]
 
 080002b6 <check_delay>:
                 
-                check_delay:                   @checks for delay = 0
-                    ldr r5, =game_delay
+                check_delay:                    @checks for delay = 0
+                    ldr r5, =game_delay         @loads the game_delay address
  80002b6:	4dd5      	ldr	r5, [pc, #852]	; (800060c <delay_1oop+0x20>)
-                    ldr r4, [r5]
+                    ldr r4, [r5]                @gets the value from the address
  80002b8:	682c      	ldr	r4, [r5, #0]
-                    
-                    cmp r4, #0
+                
+                    cmp r4, #0                  @compares if == 0
  80002ba:	2c00      	cmp	r4, #0
                     
-                    beq A4_win_game
+                    beq A4_win_game             @if equal, win or loops again
  80002bc:	d00e      	beq.n	80002dc <A4_win_game>
 
         b A4_start_game
@@ -1591,98 +1590,98 @@ A4_start_game:                                 @ start of the game
 
 080002c0 <A4_lose_game>:
 
-A4_lose_game:                                  @this makes the target light on after losing
-ldr r4, =game_light
+A4_lose_game:                                   @this makes the target light on after losing
+ldr r4, =game_light                             @loads the address of game_light
  80002c0:	4cce      	ldr	r4, [pc, #824]	; (80005fc <delay_1oop+0x10>)
-ldr r0, [r4]
+ldr r0, [r4]                                    @gets the value from the address
  80002c2:	6820      	ldr	r0, [r4, #0]
-bl BSP_LED_On
+bl BSP_LED_On                                   @Turns the target led on for lose
  80002c4:	f00b fdbe 	bl	800be44 <BSP_LED_On>
-b a4_End
+b a4_End                                        @branches to the end
  80002c8:	e026      	b.n	8000318 <a4_End>
 
 080002ca <reset_the_delay>:
 
-reset_the_delay:
-ldr r4, =game_delay
+reset_the_delay:                                
+ldr r4, =game_delay                             @loads the address of game_delay
  80002ca:	4cd0      	ldr	r4, [pc, #832]	; (800060c <delay_1oop+0x20>)
-mov r0, #0
+mov r0, #0                                      @sets r0 to 0
  80002cc:	f04f 0000 	mov.w	r0, #0
-str r0, [r4]                       @resets delay
+str r0, [r4]                                    @resets delay
  80002d0:	6020      	str	r0, [r4, #0]
 
-ldr r6, =count
+ldr r6, =count                                  @gets the address of count 
  80002d2:	4ecd      	ldr	r6, [pc, #820]	; (8000608 <delay_1oop+0x1c>)
-mov r0, #0
+mov r0, #0                                      @moves 0 to r0
  80002d4:	f04f 0000 	mov.w	r0, #0
-str r0, [r6]                        @resets count
+str r0, [r6]                                    @resets count
  80002d8:	6030      	str	r0, [r6, #0]
-b A4_start_game
+b A4_start_game                                 @branches back to the game loop
  80002da:	e7cf      	b.n	800027c <A4_start_game>
 
 080002dc <A4_win_game>:
 
 A4_win_game:
-mov r10, #2                                    @counter for win lights blink twice
+mov r10, #2                                     @counter for win lights blink twice
  80002dc:	f04f 0a02 	mov.w	sl, #2
 
 080002e0 <win_loop_A4>:
 win_loop_A4:
-    mov r9, #7                                 @led counter
+    mov r9, #7                                  @led counter
  80002e0:	f04f 0907 	mov.w	r9, #7
 
 080002e4 <led_on_toggle_loop_A4>:
-    led_on_toggle_loop_A4:                     @this loop toggles led on until all led's are on
+    led_on_toggle_loop_A4:                      @this loop toggles led on until all led's are on
         mov r0, r9
  80002e4:	4648      	mov	r0, r9
-        bl BSP_LED_On                          @toggles selected led
+        bl BSP_LED_On                           @toggles selected led
  80002e6:	f00b fdad 	bl	800be44 <BSP_LED_On>
-        subs r9, r9, #1                        @decrements the counter
+        subs r9, r9, #1                         @decrements the counter
  80002ea:	f1b9 0901 	subs.w	r9, r9, #1
-        bge led_on_toggle_loop_A4              @checks if it greater than equal to zero
+        bge led_on_toggle_loop_A4               @checks if it greater than equal to zero
  80002ee:	daf9      	bge.n	80002e4 <led_on_toggle_loop_A4>
 
-    mov r0, #Delay                             @add delay to register 0 from r4
+    mov r0, #Delay                              @add delay to register 0 from r4
  80002f0:	f06f 407f 	mvn.w	r0, #4278190080	; 0xff000000
-    bl busy_delay                              @calls busy_delay for delay
+    bl busy_delay                               @calls busy_delay for delay
  80002f4:	f000 f978 	bl	80005e8 <busy_delay>
     
-    mov r9, #7                                 @led counter
+    mov r9, #7                                  @led counter
  80002f8:	f04f 0907 	mov.w	r9, #7
 
 080002fc <led_off_toggle_loop_A4>:
-    led_off_toggle_loop_A4:                    @turns all leds off
+    led_off_toggle_loop_A4:                     @turns all leds off
         mov r0, r9                      
  80002fc:	4648      	mov	r0, r9
-        bl BSP_LED_Off                         @selected led off from r0
+        bl BSP_LED_Off                          @selected led off from r0
  80002fe:	f00b fdaf 	bl	800be60 <BSP_LED_Off>
-        subs r9, r9, #1                        @decrements the counter
+        subs r9, r9, #1                         @decrements the counter
  8000302:	f1b9 0901 	subs.w	r9, r9, #1
-        bge led_off_toggle_loop_A4             @loops until r9>=0
+        bge led_off_toggle_loop_A4              @loops until r9>=0
  8000306:	daf9      	bge.n	80002fc <led_off_toggle_loop_A4>
 
-    mov r0, #Delay                             @add delay to register 0 from r4
+    mov r0, #Delay                              @add delay to register 0 from r4
  8000308:	f06f 407f 	mvn.w	r0, #4278190080	; 0xff000000
-    bl busy_delay                              @calls busy_delay
+    bl busy_delay                               @calls busy_delay
  800030c:	f000 f96c 	bl	80005e8 <busy_delay>
 
-subs r10, r10, #1                              @decrements the cycle count.
+subs r10, r10, #1                               @decrements the cycle count.
  8000310:	f1ba 0a01 	subs.w	sl, sl, #1
-bgt win_loop_A4                                @it loops until r10 is greater than 0
+bgt win_loop_A4                                 @it loops until r10 is greater than 0
  8000314:	dce4      	bgt.n	80002e0 <win_loop_A4>
-b a4_End
+b a4_End                                        @branches to the end
  8000316:	e7ff      	b.n	8000318 <a4_End>
 
 08000318 <a4_End>:
 
-a4_End:
-ldr r6, =count
+a4_End:                                         @defines end of the function
+ldr r6, =count                                  @resetting the count at the end
  8000318:	4ebb      	ldr	r6, [pc, #748]	; (8000608 <delay_1oop+0x1c>)
-mov r0, #0
+mov r0, #0  
  800031a:	f04f 0000 	mov.w	r0, #0
 str r0, [r6]
  800031e:	6030      	str	r0, [r6, #0]
-mov r0, #0                                     @denotes Success
+mov r0, #0                                      @denotes Success
  8000320:	f04f 0000 	mov.w	r0, #0
 pop {r4-r10, lr}
  8000324:	e8bd 47f0 	ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
@@ -1698,199 +1697,213 @@ bx lr
 A4_get_accel_values:
 push {r4, r5, lr}
  800032c:	b530      	push	{r4, r5, lr}
-mov r0, #I2C_add				@stores I2C address to r0
+mov r0, #I2C_add				                @stores I2C address to r0
  800032e:	f04f 0032 	mov.w	r0, #50	; 0x32
-mov r1, #X_Hi					@stores x_hi value to r1
+mov r1, #X_Hi					                @stores x_hi value to r1
  8000332:	f04f 0129 	mov.w	r1, #41	; 0x29
-bl COMPASSACCELERO_IO_Read		@calls COMPASSACCELERO_IO_Read to get X_HI value
+bl COMPASSACCELERO_IO_Read		                @calls COMPASSACCELERO_IO_Read to get X_HI value
  8000336:	f00b fedb 	bl	800c0f0 <COMPASSACCELERO_IO_Read>
 
-sxtb r0,r0						@Converts from 8 bit to 32 bit
+sxtb r0,r0						                @Converts from 8 bit to 32 bit
  800033a:	b240      	sxtb	r0, r0
-mov r4, r0						@moves r0 to r4
+mov r4, r0						                @moves r0 to r4
  800033c:	4604      	mov	r4, r0
 
-mov r0, #I2C_add				@stores I2c address to r0
+mov r0, #I2C_add				                @stores I2c address to r0
  800033e:	f04f 0032 	mov.w	r0, #50	; 0x32
-mov r1, #Y_Hi					@stores y_hi value to r1
+mov r1, #Y_Hi					                @stores y_hi value to r1
  8000342:	f04f 012b 	mov.w	r1, #43	; 0x2b
-bl COMPASSACCELERO_IO_Read		@calls COMPASSACCELERO_IO_Read to get Y_HI value
+bl COMPASSACCELERO_IO_Read		                @calls COMPASSACCELERO_IO_Read to get Y_HI value
  8000346:	f00b fed3 	bl	800c0f0 <COMPASSACCELERO_IO_Read>
 
-sxtb r0, r0						@coverts into 32 bit
+sxtb r0, r0						                @coverts into 32 bit
  800034a:	b240      	sxtb	r0, r0
-mov r5, r0						@stores it in r5
+mov r5, r0						                @stores it in r5
  800034c:	4605      	mov	r5, r0
 
-0800034e <Loop_1>:
+0800034e <Condition_1>:
+@      if(y<-30) { Led 0 } 
+@      if(y>30) { led 7 } 
+@   }
 
-Loop_1:							@this loop turns on led 0 and 7
-    cmp r4, #-15				@compares r4 with -15
+Condition_1:							        @this condition checks and turns on led 0 and 7
+    cmp r4, #-15				                @compares r4 with -15
  800034e:	f114 0f0f 	cmn.w	r4, #15
-    ble Loop_2					@if less than equal it goes to loop 2
- 8000352:	dd10      	ble.n	8000376 <Loop_2>
+    ble Condition_2					            @if less than equal it goes to Condition 2
+ 8000352:	dd10      	ble.n	8000376 <Condition_2>
     cmp r4, #14					
  8000354:	2c0e      	cmp	r4, #14
-    bgt Loop_2					@if greater than equal goes to loop 2
- 8000356:	dc0e      	bgt.n	8000376 <Loop_2>
+    bgt Condition_2					            @if greater than equal goes to Condition 2
+ 8000356:	dc0e      	bgt.n	8000376 <Condition_2>
 
 08000358 <body>:
-    body:						@ body of loop
-        cmp r5, #-29			@comparision 
+    body:						                @body of Condition 1
+        cmp r5, #-29			                @compares with -29
  8000358:	f115 0f1d 	cmn.w	r5, #29
-        bgt next				@if greater than -29 jumps to next
+        bgt next				                @if greater than -29 jumps to next
  800035c:	dc04      	bgt.n	8000368 <next>
-        mov r0, #0
+        mov r0, #0                              @used to turn led 0 on
  800035e:	f04f 0000 	mov.w	r0, #0
-        bl Turn_Desired_Led_On
+        bl Turn_Desired_Led_On                  @calling this function to turn the led On
  8000362:	f000 f851 	bl	8000408 <Turn_Desired_Led_On>
-        b End
+        b End                                   @branches to End
  8000366:	e04c      	b.n	8000402 <End>
 
 08000368 <next>:
-        next:					@another condition
-            cmp r5, #30			
+        next:					                @another condition
+            cmp r5, #30                         @compares with 30			
  8000368:	2d1e      	cmp	r5, #30
-            ble Loop_2
- 800036a:	dd04      	ble.n	8000376 <Loop_2>
-            mov r0, #7
+            ble Condition_2                     @if less than equal branches to next Condition              
+ 800036a:	dd04      	ble.n	8000376 <Condition_2>
+            mov r0, #7                          @turns led 7 On
  800036c:	f04f 0007 	mov.w	r0, #7
-            bl Turn_Desired_Led_On
+            bl Turn_Desired_Led_On              @this function makes the led On
  8000370:	f000 f84a 	bl	8000408 <Turn_Desired_Led_On>
-            b End
+            b End                               @branches to End
  8000374:	e045      	b.n	8000402 <End>
 
-08000376 <Loop_2>:
-Loop_2:							@this loop turns on led 1 and 5
-    cmp r4, #-30
+08000376 <Condition_2>:
+@      if(y>-30 && y<-15) { Led 1 } 
+@      if(y>15 && y<30) { led 5 } 
+@   }
+
+Condition_2:							        @this Condition turns on led 1 and 5
+    cmp r4, #-30                                @compares the value with -30
  8000376:	f114 0f1e 	cmn.w	r4, #30
-    ble Loop_3					@if condition does not meets jumps to loop_3
- 800037a:	dd16      	ble.n	80003aa <Loop_3>
-    cmp r4, #-14
+    ble Condition_3					            @if condition does not meets jumps to Condition_3
+ 800037a:	dd16      	ble.n	80003aa <Condition_3>
+    cmp r4, #-14                                @compares the value with -14
  800037c:	f114 0f0e 	cmn.w	r4, #14
-    bgt Loop_3					@if condition does not meets jumps to loop_3
- 8000380:	dc13      	bgt.n	80003aa <Loop_3>
+    bgt Condition_3					            @if condition does not meets jumps to Condition_3
+ 8000380:	dc13      	bgt.n	80003aa <Condition_3>
 
 08000382 <body_2>:
-    body_2:						@condition body
-        cmp r5, #-30		
+    body_2:						                @condition 2 body
+        cmp r5, #-30		                    @compares it with -30
  8000382:	f115 0f1e 	cmn.w	r5, #30
-        ble next_2				@@if condition does not meets jumps to next_2
+        ble next_2				                @if condition does not meets jumps to next_2
  8000386:	dd07      	ble.n	8000398 <next_2>
-        cmp r5, #-14
+        cmp r5, #-14                            @compares with -14
  8000388:	f115 0f0e 	cmn.w	r5, #14
-        bgt next_2				@@if condition does not meets jumps to next_2
+        bgt next_2				                @if condition does not meets jumps to next_2
  800038c:	dc04      	bgt.n	8000398 <next_2>
-        mov r0, #1
+        mov r0, #1                              @moves 1 to pass to the function
  800038e:	f04f 0001 	mov.w	r0, #1
-        bl Turn_Desired_Led_On
+        bl Turn_Desired_Led_On                  @this function turns the desired led On
  8000392:	f000 f839 	bl	8000408 <Turn_Desired_Led_On>
-        b End
+        b End                                   @branches to End
  8000396:	e034      	b.n	8000402 <End>
 
 08000398 <next_2>:
-        next_2:					@another condition if first one is not meets
-            cmp r5, #15
+        next_2:					                @another condition if first one is not meets
+            cmp r5, #15                         @compares it with 15
  8000398:	2d0f      	cmp	r5, #15
-            ble Loop_3			@if condition does not meets jumps to loop_3
- 800039a:	dd06      	ble.n	80003aa <Loop_3>
-            cmp r5, #29
+            ble Condition_3			            @if condition does not meets jumps to Condition_3
+ 800039a:	dd06      	ble.n	80003aa <Condition_3>
+            cmp r5, #29                         @compares it with 29
  800039c:	2d1d      	cmp	r5, #29
-            bgt Loop_3			@if condition does not meets jumps to loop_3
- 800039e:	dc04      	bgt.n	80003aa <Loop_3>
-            mov r0, #5
+            bgt Condition_3			            @if condition does not meets jumps to Condition_3
+ 800039e:	dc04      	bgt.n	80003aa <Condition_3>
+            mov r0, #5                          @moves 5 to r0
  80003a0:	f04f 0005 	mov.w	r0, #5
-            bl Turn_Desired_Led_On
+            bl Turn_Desired_Led_On              @turns Led 5 ON
  80003a4:	f000 f830 	bl	8000408 <Turn_Desired_Led_On>
-            b End
+            b End                               @goes to end
  80003a8:	e02b      	b.n	8000402 <End>
 
-080003aa <Loop_3>:
-Loop_3:							@this loop turns on led 2 and 6
-    cmp r4, #15
+080003aa <Condition_3>:
+@      if(y<-15 && y>-30) { Led 2 } 
+@      if(y>15 && y<30) { led 6 } 
+@   }
+
+Condition_3:							        @this Condition turns on led 2 and 6
+    cmp r4, #15                                 @compares with 15
  80003aa:	2c0f      	cmp	r4, #15
-    ble Loop_4					@if condition does not meets jumps to loop_4	
- 80003ac:	dd15      	ble.n	80003da <Loop_4>
-    cmp r4, #29
+    ble Condition_4					            @if condition does not meets jumps to Condition_4	
+ 80003ac:	dd15      	ble.n	80003da <Condition_4>
+    cmp r4, #29                                 @compares it with 29
  80003ae:	2c1d      	cmp	r4, #29
-    bgt Loop_4					@if condition does not meets jumps to loop_4 
- 80003b0:	dc13      	bgt.n	80003da <Loop_4>
+    bgt Condition_4					            @if condition does not meets jumps to Condition_4 
+ 80003b0:	dc13      	bgt.n	80003da <Condition_4>
 
 080003b2 <body_3>:
-    body_3:						@condition body
-        cmp r5, #-30
+    body_3:						                @condition 3 body
+        cmp r5, #-30                            @compares it with -30
  80003b2:	f115 0f1e 	cmn.w	r5, #30
-        ble next_3				@if condition does not meets jumps to next_3
+        ble next_3				                @if condition does not meets jumps to next_3
  80003b6:	dd07      	ble.n	80003c8 <next_3>
-        cmp r5, #-14
+        cmp r5, #-14                            @compares with -14
  80003b8:	f115 0f0e 	cmn.w	r5, #14
-        bgt next_3				@if condition does not meets jumps to next_3
+        bgt next_3				                @if condition does not meets jumps to next_3
  80003bc:	dc04      	bgt.n	80003c8 <next_3>
-        mov r0, #2
+        mov r0, #2                              @moves 2 to r0
  80003be:	f04f 0002 	mov.w	r0, #2
-        bl Turn_Desired_Led_On
+        bl Turn_Desired_Led_On                  @turns Led 2 ON
  80003c2:	f000 f821 	bl	8000408 <Turn_Desired_Led_On>
-        b End
+        b End                                   @branches to End
  80003c6:	e01c      	b.n	8000402 <End>
 
 080003c8 <next_3>:
-        next_3:					@another condition
-            cmp r5, #15
+        next_3:					                @another condition
+            cmp r5, #15                         @compares it with 15
  80003c8:	2d0f      	cmp	r5, #15
-            ble Loop_4			@if condition does not meets jumps to loop_4
- 80003ca:	dd06      	ble.n	80003da <Loop_4>
-            cmp r5, #29
+            ble Condition_4			            @if condition does not meets jumps to Condition_4
+ 80003ca:	dd06      	ble.n	80003da <Condition_4>
+            cmp r5, #29                         @compares it with 29
  80003cc:	2d1d      	cmp	r5, #29
-            bgt Loop_4			@if condition does not meets jumps to Loop_4
- 80003ce:	dc04      	bgt.n	80003da <Loop_4>
-            mov r0, #6
+            bgt Condition_4			            @if condition does not meets jumps to Condition_4
+ 80003ce:	dc04      	bgt.n	80003da <Condition_4>
+            mov r0, #6                          @moves 6 to r0
  80003d0:	f04f 0006 	mov.w	r0, #6
-            bl Turn_Desired_Led_On
+            bl Turn_Desired_Led_On              @turns the Led 6 ON
  80003d4:	f000 f818 	bl	8000408 <Turn_Desired_Led_On>
-            b End
+            b End                               @goes to end
  80003d8:	e013      	b.n	8000402 <End>
 
-080003da <Loop_4>:
-Loop_4:						@this loop turns on led 3 and 4
-    cmp r5, #-15
+080003da <Condition_4>:
+@      if(x<-30) { Led 3 } 
+@      if(x>30) { led 4 } 
+@   }
+
+Condition_4:						            @this Condition turns on led 3 and 4
+    cmp r5, #-15                                @compares it with -15
  80003da:	f115 0f0f 	cmn.w	r5, #15
-    ble End					@if condition does not meets jumps to end 
+    ble End					                    @if condition does not meets jumps to end    
  80003de:	dd10      	ble.n	8000402 <End>
-    cmp r5, #14
+    cmp r5, #14                                 @compares it with 14
  80003e0:	2d0e      	cmp	r5, #14
-    bgt End					@if condition does not meets jumps to end
+    bgt End				    	                @if condition does not meets jumps to end
  80003e2:	dc0e      	bgt.n	8000402 <End>
 
 080003e4 <body_4>:
-    body_4:					@condition body
-        cmp r4, #-29
+    body_4:					                    @condition body
+        cmp r4, #-29                            @compares it with -29
  80003e4:	f114 0f1d 	cmn.w	r4, #29
-        bgt next_4			@if condition does not meets jumps to next condition
+        bgt next_4			                    @if condition does not meets jumps to next condition
  80003e8:	dc04      	bgt.n	80003f4 <next_4>
-        mov r0, #3
+        mov r0, #3                              @moves 3 to r0
  80003ea:	f04f 0003 	mov.w	r0, #3
-        bl Turn_Desired_Led_On
+        bl Turn_Desired_Led_On                  @turns the led 3 ON
  80003ee:	f000 f80b 	bl	8000408 <Turn_Desired_Led_On>
-        b End
+        b End                                   @branches to End
  80003f2:	e006      	b.n	8000402 <End>
 
 080003f4 <next_4>:
-        next_4:				@another condition
-            cmp r4, #30
+        next_4:				                    @another condition
+            cmp r4, #30                         @compares with 30
  80003f4:	2c1e      	cmp	r4, #30
-            ble End			@if condition does not meets jumps to End
+            ble End			                    @if condition does not meets jumps to End
  80003f6:	dd04      	ble.n	8000402 <End>
-            mov r0, #4
+            mov r0, #4                          @moves 4 to r0
  80003f8:	f04f 0004 	mov.w	r0, #4
-            bl Turn_Desired_Led_On
+            bl Turn_Desired_Led_On              @makes led 4 ON
  80003fc:	f000 f804 	bl	8000408 <Turn_Desired_Led_On>
-            b End
+            b End                               @branches to End
  8000400:	e7ff      	b.n	8000402 <End>
 
 08000402 <End>:
 
-
-End:							@end label
+End:							                @end label
 
 pop {r4, r5, lr}
  8000402:	e8bd 4030 	ldmia.w	sp!, {r4, r5, lr}
@@ -1898,29 +1911,29 @@ bx lr
  8000406:	4770      	bx	lr
 
 08000408 <Turn_Desired_Led_On>:
+@ Input: int
 @ Returns: int
-@
 @ Here is the actual Turn_Desired_Led_On function
 
 Turn_Desired_Led_On:
 push {r4, lr}
  8000408:	b510      	push	{r4, lr}
-mov r4, r0
+mov r4, r0                                      @moves the led value to r4( just preserving )
  800040a:	4604      	mov	r4, r0
-bl BSP_LED_On
+bl BSP_LED_On                                   @makes desired led on
  800040c:	f00b fd1a 	bl	800be44 <BSP_LED_On>
 
-mov r0, #500
+mov r0, #500                                    @acts as a led refresh rate (makes more brighter)
  8000410:	f44f 70fa 	mov.w	r0, #500	; 0x1f4
-bl busy_delay
+bl busy_delay                                   @calls busy delay for the same reason
  8000414:	f000 f8e8 	bl	80005e8 <busy_delay>
 
-mov r0, r4
+mov r0, r4                                      @gets the led value to r0
  8000418:	4620      	mov	r0, r4
-bl BSP_LED_Off
+bl BSP_LED_Off                                  @turns desired led off
  800041a:	f00b fd21 	bl	800be60 <BSP_LED_Off>
 
-mov r0, r4
+mov r0, r4                                      @sends the led value back for the calling function
  800041e:	4620      	mov	r0, r4
 
 pop {r4, lr}
@@ -1938,32 +1951,32 @@ jp_a4_timer_tick:
 push {r9, lr}
  8000428:	e92d 4200 	stmdb	sp!, {r9, lr}
 
-ldr r9, =game_time
+ldr r9, =game_time                              @loads the address of game_time
  800042c:	f8df 91d0 	ldr.w	r9, [pc, #464]	; 8000600 <delay_1oop+0x14>
 
 08000430 <Game_timer>:
-Game_timer:
-    ldr r0, [r9]
+Game_timer:                                     
+    ldr r0, [r9]                                @loads the value from the address
  8000430:	f8d9 0000 	ldr.w	r0, [r9]
-    cmp r0, #0
+    cmp r0, #0                                  @compares it with r0
  8000434:	2800      	cmp	r0, #0
-    bne game_count
- 8000436:	d1ff      	bne.n	8000438 <game_count>
+    ble end_game_timer                          @if less than equals ends
+ 8000436:	dd04      	ble.n	8000442 <end_game_timer>
 
 08000438 <game_count>:
-    game_count:
-        subs r0, r0, #1
+    game_count:                                 
+        subs r0, r0, #1                         @subtracts the value from the r0
  8000438:	3801      	subs	r0, #1
-        str r0, [r9]
+        str r0, [r9]                            @stores the value back to the address
  800043a:	f8c9 0000 	str.w	r0, [r9]
-        cmp r0, #0
+        cmp r0, #0                              @compares if less than equal to 0
  800043e:	2800      	cmp	r0, #0
-        ble end_game_timer
+        ble end_game_timer                      @branches to end
  8000440:	ddff      	ble.n	8000442 <end_game_timer>
 
 08000442 <end_game_timer>:
 
-end_game_timer:
+end_game_timer:                                 @defines end of game timer
 pop {r9, lr}
  8000442:	e8bd 4200 	ldmia.w	sp!, {r9, lr}
 bx lr
@@ -1978,27 +1991,27 @@ jp_a4_delay_tick:
 push {r9, lr}
  8000448:	e92d 4200 	stmdb	sp!, {r9, lr}
 
-ldr r9, =game_delay
+ldr r9, =game_delay                             @loads the address of game_delay
  800044c:	f8df 91bc 	ldr.w	r9, [pc, #444]	; 800060c <delay_1oop+0x20>
 
 08000450 <Game_delay>:
-Game_delay:
-    ldr r0, [r9]
+Game_delay: 
+    ldr r0, [r9]                                @loads the value from the address
  8000450:	f8d9 0000 	ldr.w	r0, [r9]
-    cmp r0, #0
+    cmp r0, #0                                  @compares it with 0
  8000454:	2800      	cmp	r0, #0
-    ble end_game_delay
+    ble end_game_delay                          @if <=0 ends
  8000456:	dd04      	ble.n	8000462 <end_game_delay>
 
 08000458 <game_delay_count>:
     game_delay_count:
-        subs r0, r0, #1
+        subs r0, r0, #1                         @decrements the timer count
  8000458:	3801      	subs	r0, #1
-        str r0, [r9]
+        str r0, [r9]                            @stores the value back to the address
  800045a:	f8c9 0000 	str.w	r0, [r9]
-        cmp r0, #0
+        cmp r0, #0                              @compares it with 0
  800045e:	2800      	cmp	r0, #0
-        ble end_game_delay
+        ble end_game_delay                      @if <=0 ends
  8000460:	ddff      	ble.n	8000462 <end_game_delay>
 
 08000462 <end_game_delay>:
@@ -2373,17 +2386,17 @@ pop {r5}
  80005f4:	bc20      	pop	{r5}
 bx lr @ Return (Branch eXchange) to the address in the link register (lr)
  80005f6:	4770      	bx	lr
-ldr r6, =actual_delay
+ldr r6, =actual_delay                           @r6 will hold the address of the actual_delay Variable
  80005f8:	20000035 	.word	0x20000035
-ldr r9, =game_light
+ldr r9, =game_light                             @holds the address of the global var: game_light
  80005fc:	2000002d 	.word	0x2000002d
-ldr r8, =game_time
+ldr r8, =game_time                              @r8 will hold the address of game_time 
  8000600:	20000025 	.word	0x20000025
-ldr r7, =mili_secs
+ldr r7, =mili_secs                              @r7 will hold the address of mili_secs
  8000604:	20000031 	.word	0x20000031
-                ldr r6, =count
+                ldr r6, =count                  @loads the count address
  8000608:	20000021 	.word	0x20000021
-                ldr r4, =game_delay
+                ldr r4, =game_delay             @loads the delay address
  800060c:	20000029 	.word	0x20000029
 
 08000610 <mytest>:
@@ -13778,8 +13791,8 @@ my_Init:
  8007cc2:	bf00      	nop
 
 08007cc4 <CmdLED>:
-  jp_a4_timer_tick();
-  jp_a4_delay_tick();
+  jp_a4_timer_tick();                             //function call for Assignment 4 game timer
+  jp_a4_delay_tick();                             //function call for Assignment 4 game timer
 }
 
 void CmdLED(int mode)
@@ -14077,17 +14090,17 @@ void CmdButton(int mode)
  8007e6a:	f001 fc15 	bl	8009698 <HAL_IncTick>
     my_Tick();
  8007e6e:	f7f8 fbd9 	bl	8000624 <my_Tick>
-  jp_a4_timer_tick();
+  jp_a4_timer_tick();                             //function call for Assignment 4 game timer
  8007e72:	f7f8 fad9 	bl	8000428 <jp_a4_timer_tick>
 }
  8007e76:	e8bd 4008 	ldmia.w	sp!, {r3, lr}
-  jp_a4_delay_tick();
+  jp_a4_delay_tick();                             //function call for Assignment 4 game timer
  8007e7a:	f7f8 bae5 	b.w	8000448 <jp_a4_delay_tick>
 	...
 
 08007e80 <_jp_A4>:
 // Function Description: This is the function used for Assignment 4 and This function gets three parameters from UI and sends it to the asm file.
-// Fetch_uint32_arg gets three parameters : delay, target, and light_time
+// Fetch_uint32_arg gets three parameters : delay, target, and game_time
 
 void _jp_A4(int action)
 {

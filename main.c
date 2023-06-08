@@ -121,16 +121,16 @@ void Error_Handler(void)
   }
 }
 
-void jp_a4_timer_tick(void);
-void jp_a4_delay_tick(void);
+void jp_a4_timer_tick(void);                      //function declaration for Assignment 4 game timer
+void jp_a4_delay_tick(void);                      //function declaration for Assignment 4 delay timer
 
 void SysTick_Handler(void)
 {
     
     HAL_IncTick();
     my_Tick();
-  jp_a4_timer_tick();
-  jp_a4_delay_tick();
+  jp_a4_timer_tick();                             //function call for Assignment 4 game timer
+  jp_a4_delay_tick();                             //function call for Assignment 4 game timer
 }
 
 void CmdLED(int mode)
