@@ -323,6 +323,47 @@ bx lr
 
 .size A4_get_accel_values, .-A4_get_accel_values @@ - symbol size (not strictly required, but makes the debugger happy)
 
+@@ Function Header Block
+.align 2 @ Code alignment - 2^n alignment (n=2)
+@ This causes the assembler to use 4 byte alignment
+.syntax unified @ Sets the instruction set to the new unified ARM + THUMB
+@ instructions. The default is divided (separate instruction sets)
+.global jp_a4_timer_tick @ Make the symbol name for the function visible to the linker
+.code 16 @ 16bit THUMB code (BOTH .code and .thumb_func are required)
+.thumb_func @ Specifies that the following symbol is the name of a THUMB 
+
+@ encoded function. Necessary for interlinking between ARM and THUMB code.
+.type jp_a4_timer_tick, %function @ Declares that the symbol is a function (not strictly required)
+
+@ Function Declaration : void jp_a4_timer_tick(void)
+@
+@ Input: void
+@ Returns: void
+@
+@ Here is the actual jp_a4_timer_tick function
+
+jp_a4_timer_tick:
+
+push {r9, lr}
+
+ldr r9, =game_time
+Game_timer:
+    ldr r0, [r9]
+    cmp r0, #0
+    bne game_count
+    game_count:
+        subs r0, r0, #1
+        str r0, [r9]
+        cmp r0, #0
+        ble end_game_timer
+
+end_game_timer:
+pop {r9, lr}
+bx lr
+
+.size jp_a4_timer_tick, .-jp_a4_timer_tick @@ - symbol size (not strictly required, but makes the debugger happy)
+
+
 
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Past Assignments & Labs @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@

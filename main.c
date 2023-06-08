@@ -121,10 +121,14 @@ void Error_Handler(void)
   }
 }
 
+void jp_a4_timer_tick(void);
+
 void SysTick_Handler(void)
 {
+    
     HAL_IncTick();
     my_Tick();
+  jp_a4_timer_tick();
 }
 
 void CmdLED(int mode)
